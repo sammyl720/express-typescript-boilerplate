@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A Node Express Typescript Boilerplate API",
   "main": "index.js",
+  "repository": {
+    "url": "https://github.com/sammyl720/express-typescript-boilerplate"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./dist/index.js",
