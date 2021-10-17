@@ -1,7 +1,7 @@
 import { Router } from "express";
 import ProductController from "../../controller/products/product-controller";
 import IProduct, { IValidKey } from "../../model/product/product-model";
-
+import middleware, { IRequest } from '../../middleware/middleware';
 const router = Router();
 
 /**
@@ -10,7 +10,7 @@ const router = Router();
  * Method: GET
  */
 router.get('/', (req, res) => {
-  return res.json(ProductController.getAllProducts());
+  return res.json(ProductController.getAllProducts(req.query));
 })
 
 /**
@@ -38,7 +38,7 @@ router.get("/:id", (req,res) => {
  * Method Post
  * Body: Omit<IProduct, id>
  */
-router.post('/', (req,res) => {
+router.post('/', middleware.ensureAuth, (req,res) => {
   const errors: { field: string, error: string}[] = [];
   const requiredFields: Array<IValidKey> = [
     'name',
@@ -120,8 +120,8 @@ router.post('/', (req,res) => {
   }
 
   const { price, name, details, quantity} = req.body as Omit<IProduct, 'id'>
-
   const newProduct: Omit<IProduct, 'id'> = {
+    userId: (req as IRequest).user.id,
     price,
     name,
     details,
@@ -142,7 +142,7 @@ router.post('/', (req,res) => {
  * Method: PUT,
  * Body: Partial<Omit<IProduct, 'id'>>
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', middleware.ensureAuth, (req, res) => {
   const { id } = req.params;
   const productToUpdate = req.body;
   const validProps: Array<string> = [
@@ -158,7 +158,7 @@ router.put('/:id', (req, res) => {
     }
   }
 
-  const updatedProduct = ProductController.updateAProduct(id, productToUpdate)
+  const updatedProduct = ProductController.updateAProduct(id, productToUpdate, (req as IRequest).user)
 
   if(!updatedProduct){
     return res.status(404).json({
@@ -178,9 +178,9 @@ router.put('/:id', (req, res) => {
  * Route /api/products/:id
  * Method DELETE
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', middleware.ensureAuth, (req, res) => {
   const { id } = req.params;
-  const productWasFoundAndDeleted = ProductController.deleteProduct(id);
+  const productWasFoundAndDeleted = ProductController.deleteProduct(id, (req as IRequest).user);
 
   if(!productWasFoundAndDeleted){
     return res.status(404).json({
