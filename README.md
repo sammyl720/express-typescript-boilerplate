@@ -1,8 +1,8 @@
 
 ### A Simple node express typescript boilerplate REST API
 
-Build your express typescript project faster with boilerplate
-
+Build your express typescript project faster with this boilerplate.
+This Branch saves data to file
 
 ## API Reference
 

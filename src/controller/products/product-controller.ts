@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import ProductData from "../../data/products";
 import IProduct from "../../model/product/product-model";
-import IUser from '../../model/product/user-model';
+import IUser from '../../model/user/user-model';
 
 export default class ProductController extends ProductData {
   static get products(){

@@ -1,4 +1,4 @@
-import IUser from "../model/product/user-model";
+import IUser from "../model/user/user-model";
 import fs from 'fs';
 import path from "path";
 
@@ -17,6 +17,6 @@ export default class UserData {
   static AddUser(user: IUser){
     const users = UserData._getUsers();
     users.push(user);
-    fs.writeFileSync(UserData._filePath, JSON.stringify(users));
+    fs.writeFileSync(UserData._filePath, JSON.stringify(users, null, 2));
   }
 }

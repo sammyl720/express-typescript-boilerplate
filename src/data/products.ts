@@ -6,7 +6,7 @@ export default class ProductData {
   private static _filePath = path.resolve(__dirname, 'products-data.json');
 
   private static UpdateProductList(products: IProduct[]){
-    fs.writeFileSync(ProductData._filePath, JSON.stringify(products));
+    fs.writeFileSync(ProductData._filePath, JSON.stringify(products, null, 2));
   }
   protected static GetAllProducts(){
     const jsonProducts = fs.readFileSync(ProductData._filePath, 'utf-8');
@@ -16,7 +16,7 @@ export default class ProductData {
   protected static AddProduct(product: IProduct){
     const products = ProductData.GetAllProducts();
     products.push(product);
-    fs.writeFileSync(ProductData._filePath, JSON.stringify(products));
+    ProductData.UpdateProductList(products);
   }
 
   protected static UpdateProduct(product: IProduct){
