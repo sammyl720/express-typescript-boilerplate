@@ -1,6 +1,22 @@
 import IUser from "../model/product/user-model";
+import fs from 'fs';
+import path from "path";
 
-const users: IUser[] = [
-]
+export default class UserData {
+  private static _filePath = path.resolve(__dirname, 'users-data.json');
+  protected static _getUsers(){
+    const jsonUsers = fs.readFileSync(UserData._filePath, 'utf-8');
+    const users = JSON.parse(jsonUsers) as IUser[];
+    return users;
+  }
+  static GetUser(userId: string){
+    const user = UserData._getUsers().find(u => u.id === userId);
+    return user || null;
+  }
 
-export default users;
+  static AddUser(user: IUser){
+    const users = UserData._getUsers();
+    users.push(user);
+    fs.writeFileSync(UserData._filePath, JSON.stringify(users));
+  }
+}

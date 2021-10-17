@@ -1,56 +1,59 @@
 import { v4 } from 'uuid';
-import products from "../../data/products";
+import ProductData from "../../data/products";
 import IProduct from "../../model/product/product-model";
 import IUser from '../../model/product/user-model';
 
-export default class ProductController {
-
+export default class ProductController extends ProductData {
+  static get products(){
+    return ProductController.GetAllProducts()
+  } 
   private static _FindIndexOfProduct(id: string) {
-    return products.findIndex(product => product.id === id);
+    return ProductController.products.findIndex(product => product.id === id);
   }
   // get all products
   static getAllProducts(query: { [key: string]: any }):IProduct[]{
     if(query.userId){
-      return products.filter(prod => prod.userId === query.userId);
+      return ProductController.products.filter(prod => prod.userId === query.userId);
     }
-    return products
+    return ProductController.products;
   }
   
   // get a product
   static getProduct(id: string): IProduct | null {
-    const product = products.find(product => product.id === id);
+    const product = ProductController.products.find(product => product.id === id);
     return product ? product : null;
   }
 
   static AddAProduct(newProduct: Omit<IProduct, 'id'>): string {
-    products.push({
+    const product: IProduct = {
       ...newProduct,
       id: v4()
-    })
-    return '/api/products/'+ products[products.length - 1].id;
+    }
+    ProductController.AddProduct(product)
+    return '/api/products/'+ product.id;
   }
   
   // update a product
   static updateAProduct(id: string, updatedDetails: Partial<Omit<IProduct, 'id'>>, currentUser: IUser): IProduct | null  {
   
     const indexOfProduct = ProductController._FindIndexOfProduct(id)
-  
     if(indexOfProduct === -1) return null;
-    if(products[indexOfProduct].userId !== currentUser.id){ return null }
-    products[indexOfProduct] = {
-      ...products[indexOfProduct],
+    if(ProductController.products[indexOfProduct].userId !== currentUser.id){ return null }
+    const product: IProduct = {
+      ...ProductController.products[indexOfProduct],
       ...updatedDetails
     }
-  
-    return products[indexOfProduct];
+    
+    ProductController.UpdateProduct(product)
+    return product;
   }
   
   // delete a product
   static deleteProduct(id: string, currentUser: IUser): boolean {
     const indexOfProduct = ProductController._FindIndexOfProduct(id);
     if(indexOfProduct === -1) return false;
-    if(products[indexOfProduct].userId !== currentUser.id) return false;
-    products.splice(indexOfProduct, 1);
+    if(ProductController.products[indexOfProduct].userId !== currentUser.id) return false;
+    ProductController.DeleteProduct(id);
     return true;
   }
 }

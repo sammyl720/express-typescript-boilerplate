@@ -1,15 +1,15 @@
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
-import users from '../../data/user';
+import UserData from '../../data/user';
 import IUser from '../../model/product/user-model';
 import { v4 } from 'uuid';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'notAG00dS3cr3t';
 
-export default class UserController {
+export default class UserController extends UserData {
   static newUser(username: string, password: string){
     // check if user with given username already exists
-    const userAlreadyExists = users.findIndex(user => user.username == username);
+    const userAlreadyExists = UserController._getUsers().findIndex(user => user.username == username);
     if(userAlreadyExists !== -1){
       const error = { message: `User with username ${username} already exists` };
       return { error, token: null }
@@ -26,8 +26,8 @@ export default class UserController {
       username
     }
 
-    // save the user to in memory data
-    users.push(newUser);
+    // save the user to file data
+    UserController.AddUser(newUser);
 
     return {
       error: null,
@@ -36,7 +36,7 @@ export default class UserController {
   }
 
   static loginUser(username: string, password: string){
-    const user = users.find(u => u.username === username);
+    const user = UserController._getUsers().find(u => u.username === username);
     // check if user exists
     if(!user) {
       return {
