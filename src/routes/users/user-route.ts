@@ -1,4 +1,5 @@
 import { Router } from "express";
+import ProductController from "../../controller/products/product-controller";
 import UserController from "../../controller/users/user-controller";
 import middleware, { IRequest } from '../../middleware/middleware';
 interface IError {
@@ -74,7 +75,7 @@ router.get('/', middleware.ensureAuth, (req, res) => {
  */
 router.post('/login', async (req,res) => {
   const { username, password } = req.body;
-  
+  console.log(username, password, req.body);
   const errors = checkFields(username, password);
 
   if(errors.length > 0){
@@ -90,4 +91,15 @@ router.post('/login', async (req,res) => {
     return res.json({ token })
   }
 });
+
+/**
+ * Get user's products
+ * Route /api/users/products
+ * Method Get
+ */
+router.get('/products', middleware.ensureAuth, async (req, res) => {
+  const user = (req as IRequest).user
+  const products = await ProductController.getAllProducts(10, user.id);
+  return res.json(products)
+})
 export default router;

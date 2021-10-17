@@ -10,7 +10,8 @@ const router = Router();
  * Method: GET
  */
 router.get('/', async (req, res) => {
-  return res.json(await ProductController.getAllProducts(req.query));
+  const { limit = 20, userId = null } = req.query;
+  return res.json(await ProductController.getAllProducts(Number(limit), userId as string | null));
 })
 
 /**

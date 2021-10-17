@@ -4,12 +4,12 @@ import IUser from '../../model/user/user-model';
 
 export default class ProductController extends ProductData {
   static get products(){
-    return ProductController.GetAllProducts()
+    return ProductController.GetAllProducts(100);
   }
 
   // get all products
-  static async getAllProducts(query: { [key: string]: any }):Promise<IProduct[]>{
-    const products = await ProductController.products;
+  static async getAllProducts(limit = 20, userId: string | null):Promise<IProduct[]>{
+    const products = await ProductController.GetAllProducts(limit, userId);
     return products as IProduct[];
   }
   

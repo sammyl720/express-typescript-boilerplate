@@ -6,8 +6,15 @@ export default class ProductData {
   protected static async GetProduct(id: string){
     return await ProductModel.findById(id);
   }
-  protected static async GetAllProducts(){
-    const products = await ProductModel.find();
+  protected static async GetAllProducts(limit = 20, userId: string | null = null){
+    const query: { [key: string]: string} = {
+    }
+
+    if(userId){
+      query['userId'] = userId;
+    }
+    
+    const products = await ProductModel.find(query).limit(limit);
     return products;
   }
 
