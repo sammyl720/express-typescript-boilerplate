@@ -33,7 +33,7 @@ const router = Router();
  * Method Post
  * Body: { username: string, password: string }
  */
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
   const { username, password } = req.body;
   
   const errors = checkFields(username, password);
@@ -42,7 +42,7 @@ router.post('/signup', (req, res) => {
     return res.status(400).json(errors);
   }
 
-  const { error, token } = UserController.newUser(username, password);
+  const { error, token } = await UserController.newUser(username, password);
 
   if(error){
     return res.status(400).json({error});
@@ -56,7 +56,7 @@ router.post('/signup', (req, res) => {
  * route /api/users/login
  * method Post
  */
-router.post('/login', (req,res) => {
+router.post('/login', async (req,res) => {
   const { username, password } = req.body;
   
   const errors = checkFields(username, password);
@@ -65,7 +65,7 @@ router.post('/login', (req,res) => {
     return res.status(400).json(errors);
   }
 
-  const { error, token } = UserController.loginUser(username, password);
+  const { error, token } = await UserController.loginUser(username, password);
 
   if(error){
     console.log(error);

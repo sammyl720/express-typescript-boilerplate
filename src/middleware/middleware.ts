@@ -4,7 +4,7 @@ import UserController from "../controller/users/user-controller";
 export interface IRequest extends Request {
   [key: string]: any;
 }
-const ensureAuth = (req: IRequest, res: Response, next: NextFunction) => {
+const ensureAuth = async (req: IRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization'];
   if(!authHeader){
     return res.status(401).json({
@@ -24,7 +24,7 @@ const ensureAuth = (req: IRequest, res: Response, next: NextFunction) => {
   }
 
   try {
-    const user = UserController.getUserFromToken(token);
+    const user = await UserController.getUserFromToken(token);
     req.user = user;
     next();
   } catch (error) {

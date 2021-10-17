@@ -1,22 +1,16 @@
-import IUser from "../model/user/user-model";
-import fs from 'fs';
-import path from "path";
+import IUser from "../model/user/user-model";;
+import UserModel from "./models/user";
 
 export default class UserData {
-  private static _filePath = path.resolve(__dirname, 'users-data.json');
-  protected static _getUsers(){
-    const jsonUsers = fs.readFileSync(UserData._filePath, 'utf-8');
-    const users = JSON.parse(jsonUsers) as IUser[];
-    return users;
-  }
-  static GetUser(userId: string){
-    const user = UserData._getUsers().find(u => u.id === userId);
+  static async GetUser(userId: string){
+    
+    const user = await UserModel.findById(userId).select('-password')
     return user || null;
   }
 
-  static AddUser(user: IUser){
-    const users = UserData._getUsers();
-    users.push(user);
-    fs.writeFileSync(UserData._filePath, JSON.stringify(users, null, 2));
+  static async AddUser(user: Omit<IUser, 'id'>){
+    const newUser = new UserModel(user);
+    await newUser.save();
+    return newUser;
   }
 }

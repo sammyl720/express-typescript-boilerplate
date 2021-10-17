@@ -1,16 +1,17 @@
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
-import UserData from '../../data/user';
 import IUser from '../../model/user/user-model';
 import { v4 } from 'uuid';
+import UserModel from '../../data/models/user';
+import UserData from '../../data/user';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'notAG00dS3cr3t';
 
 export default class UserController extends UserData {
-  static newUser(username: string, password: string){
+  static async newUser(username: string, password: string){
     // check if user with given username already exists
-    const userAlreadyExists = UserController._getUsers().findIndex(user => user.username == username);
-    if(userAlreadyExists !== -1){
+    const userAlreadyExists = await UserModel.findOne({ username })
+    if(userAlreadyExists){
       const error = { message: `User with username ${username} already exists` };
       return { error, token: null }
     }
@@ -20,23 +21,21 @@ export default class UserController extends UserData {
 
     // create new user;
 
-    const newUser: IUser = {
-      id: v4(),
+    const newUser: Omit<IUser, "id"> = {
       password: hashPassword,
       username
     }
 
-    // save the user to file data
-    UserController.AddUser(newUser);
-
+    // save the user to db data
+    const dbUser = await UserController.AddUser(newUser);
     return {
       error: null,
-      token: this.genereteUserToken(newUser)
+      token: this.genereteUserToken(dbUser)
     }
   }
 
-  static loginUser(username: string, password: string){
-    const user = UserController._getUsers().find(u => u.username === username);
+  static async loginUser(username: string, password: string){
+    const user = await UserModel.findOne({ username })
     // check if user exists
     if(!user) {
       return {
@@ -73,9 +72,10 @@ export default class UserController extends UserData {
    * @returns user IUser
    */
   
-  static getUserFromToken(token: string){
+  static async getUserFromToken(token: string){
     const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
-    return decoded.user as IUser;
+    const user = await UserController.GetUser(decoded.user.id);
+    return user as Omit<IUser, "password">;
   }
 
   /**
@@ -85,7 +85,12 @@ export default class UserController extends UserData {
    * @returns a jwt token
    */
   static genereteUserToken(user: IUser, expiresIn: string | number | undefined = '2d'){
-    const token = jwt.sign({ user }, JWT_SECRET, { expiresIn })
+    // set id prop from mongoose getter id
+    const filteredUser: Omit<IUser, "password"> = {
+      username: user.username,
+      id: user.id
+    }
+    const token = jwt.sign({ user: filteredUser }, JWT_SECRET, { expiresIn })
 
     return token;
   }

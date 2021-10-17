@@ -9,8 +9,8 @@ const router = Router();
  * Route: /api/products
  * Method: GET
  */
-router.get('/', (req, res) => {
-  return res.json(ProductController.getAllProducts(req.query));
+router.get('/', async (req, res) => {
+  return res.json(await ProductController.getAllProducts(req.query));
 })
 
 /**
@@ -18,10 +18,10 @@ router.get('/', (req, res) => {
  * Route: /api/products/:id
  * Method: GET
  */
-router.get("/:id", (req,res) => {
+router.get("/:id", async (req,res) => {
   const { id } = req.params;
 
-  const product = ProductController.getProduct(id);
+  const product = await ProductController.getProduct(id);
 
   if(!product){
     return res.status(404).json({
@@ -38,7 +38,7 @@ router.get("/:id", (req,res) => {
  * Method Post
  * Body: Omit<IProduct, id>
  */
-router.post('/', middleware.ensureAuth, (req,res) => {
+router.post('/', middleware.ensureAuth, async (req,res) => {
   const errors: { field: string, error: string}[] = [];
   const requiredFields: Array<IValidKey> = [
     'name',
@@ -128,7 +128,7 @@ router.post('/', middleware.ensureAuth, (req,res) => {
     quantity,
     inStock: quantity > 0
   }
-  const productResourceUrl = ProductController.AddAProduct(newProduct);
+  const productResourceUrl = await ProductController.AddAProduct(newProduct);
 
   return res.status(201).json({
     message: 'New Product Created',
@@ -142,7 +142,7 @@ router.post('/', middleware.ensureAuth, (req,res) => {
  * Method: PUT,
  * Body: Partial<Omit<IProduct, 'id'>>
  */
-router.put('/:id', middleware.ensureAuth, (req, res) => {
+router.put('/:id', middleware.ensureAuth, async (req, res) => {
   const { id } = req.params;
   const productToUpdate = req.body;
   const validProps: Array<string> = [
@@ -158,7 +158,7 @@ router.put('/:id', middleware.ensureAuth, (req, res) => {
     }
   }
 
-  const updatedProduct = ProductController.updateAProduct(id, productToUpdate, (req as IRequest).user)
+  const updatedProduct = await ProductController.updateAProduct(id, productToUpdate, (req as IRequest).user)
 
   if(!updatedProduct){
     return res.status(404).json({
@@ -178,9 +178,9 @@ router.put('/:id', middleware.ensureAuth, (req, res) => {
  * Route /api/products/:id
  * Method DELETE
  */
-router.delete('/:id', middleware.ensureAuth, (req, res) => {
+router.delete('/:id', middleware.ensureAuth, async (req, res) => {
   const { id } = req.params;
-  const productWasFoundAndDeleted = ProductController.deleteProduct(id, (req as IRequest).user);
+  const productWasFoundAndDeleted = await ProductController.deleteProduct(id, (req as IRequest).user);
 
   if(!productWasFoundAndDeleted){
     return res.status(404).json({
