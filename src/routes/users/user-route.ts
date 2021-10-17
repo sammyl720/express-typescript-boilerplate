@@ -1,6 +1,6 @@
 import { Router } from "express";
 import UserController from "../../controller/users/user-controller";
-
+import middleware, { IRequest } from '../../middleware/middleware';
 interface IError {
   field?: string;
   error: string | string[];
@@ -49,6 +49,22 @@ router.post('/signup', async (req, res) => {
   } else {
     return res.json({ token })
   }
+})
+
+/**
+ * get current user
+ * route /api/users
+ * method GET
+ * auth header in the format of Bearer <token> required
+ */
+router.get('/', middleware.ensureAuth, (req, res) => {
+  const user = (req as IRequest).user
+  return res.json({
+    user: {
+      id: user._id,
+      username: user.username
+    }
+  })
 })
 
 /**

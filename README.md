@@ -6,6 +6,14 @@ This Branch Has MongoDb Integration
 
 ## API Reference
 
+#### Get Current User
+
+```http
+  GET /api/users
+  requires auth header in the format of Bearer <token>
+  return user info
+```
+
 #### Signup User
 
 ```http
