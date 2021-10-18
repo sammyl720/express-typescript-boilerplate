@@ -24,8 +24,18 @@ const ProductSchema = new Schema({
   price: {
     type: Number,
     default: 0
-  }
+  },
+  id: String
 })
+
+// add an id on pre save
+ProductSchema.pre('save', function (next) {
+  this.id = this._id.toString();
+  next();
+});
+
+
+
 
 const ProductModel = model('Product', ProductSchema);
 

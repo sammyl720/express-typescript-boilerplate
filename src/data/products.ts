@@ -13,8 +13,14 @@ export default class ProductData {
     if(userId){
       query['userId'] = userId;
     }
-    
-    const products = await ProductModel.find(query).limit(limit);
+
+    let products = await ProductModel.find(query).limit(limit);
+    products = products.map(product => {
+      if(!product.id){
+        product.id = product._id.toString();
+      }
+      return product;
+    });
     return products;
   }
 
