@@ -4,7 +4,7 @@ import userRoutes from './routes/users/user-route';
 import resources from './details';
 import mongoose from 'mongoose';
 
-
+console.log(process.env)
 const app = express();
 
 // enable CORS
@@ -68,7 +68,7 @@ app.get("/", (req,res) => {
    * load the mongodb connection string from enviroment or set local mongodb server as default
    */
   const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/db";
-  
+
   /**
    * start application
    * and connect to mongodb
@@ -76,7 +76,7 @@ app.get("/", (req,res) => {
   app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
     mongoose.connect(MONGO_URI).then(() => {
-      console.log("Connected to MongoDb database " + MONGO_URI.match(/\w+$/));
+      console.log("Connected to MongoDb");
     }).catch(console.error)
   });
 })()

@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sammyl720/rest-api:latest
+    ports:
+      - "80:80"
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+      - MONGO_URI=mongodb://${DB_USER}:${DB_PASSWORD}@mongoapp:27017
+      - PORT=80
+    depends_on:
+      - mongoapp
+    restart: unless-stopped
+    networks:
+      - app
+  mongoapp:
+    image: mongo:5.0
+    networks:
+      - app
+    ports:    
+      - "27017:27017"
+    volumes:
+      - data:/data/db
+    env_file: ./.env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped
+
+networks:
+  app:
+    driver: overlay
+    attachable: true
+volumes:
+  data:
+    driver: local
